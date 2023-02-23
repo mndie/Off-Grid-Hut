@@ -1,0 +1,16 @@
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x--, 16, 2); //instead of -- type adress that came out in serial monitor in scanner 
+void setup() 
+{
+  lcd.begin();
+  lcd.backlight();
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Hello");
+  lcd.setCursor(0,1);
+  lcd.print("World");
+}
+void loop()
+{
+}

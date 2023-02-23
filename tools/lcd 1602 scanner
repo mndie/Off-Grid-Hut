@@ -1,0 +1,41 @@
+#include <Wire.h>
+void setup()
+{
+Wire.begin();
+Serial.begin(9600);
+Serial.println("I2C Scanner");
+}
+void loop()
+{
+byte error, address;
+int Devices;
+Serial.println("Scanning...");
+Devices = 0;
+for(address = 1; address < 127; address++ )
+{
+
+Wire.beginTransmission(address);
+error = Wire.endTransmission();
+if (error == 0)
+{
+Serial.print("I2C najdene na adrese 0x");
+if (address<16)
+Serial.print("0");
+Serial.print(address,HEX);
+Serial.println("  !");
+Devices++;
+}
+else if (error==4)
+{
+Serial.print("Neznama chyba na addrese 0x");
+if (address<16)
+Serial.print("0");
+Serial.println(address,HEX);
+}
+}
+if (Devices == 0)
+Serial.println("Ziadne I2C zariadenie sa nenaslo...");
+else
+Serial.println("done\n");
+delay(5000);          
+}

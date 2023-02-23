@@ -1,0 +1,160 @@
+//complete code so far, will update everytime i change smthn
+//code for temmp, humidity sensors and 4x20 liquid crystal i2c display 
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h> 
+#include <TroykaDHT.h> 
+
+LiquidCrystal_I2C lcd(0x27,20, 4); //define I2C adress and display size
+
+DHT dht(4, DHT11); //we r defining what sensor r we using and on what pin 
+DHT dht1(5, DHT11); //we r using 2 DHT11 sensors so we r gonna add 1 to the 2nd to separate them 
+
+void setup() {
+  Serial.begin(9600); //start serial monitor
+
+  lcd.begin(); //start lcd 
+  lcd.backlight(); //backlight on
+  lcd.clear(); //clear display
+
+  dht.begin(); //start sensors for indoor temp/humi measuring
+  dht1.begin(); //start sensors for outdoor temp/humi measuring
+
+}
+
+void loop() {
+  delay(1000);
+  lcd.clear(); 
+
+  dht.read(); 
+    switch(dht.getState()) {   
+      case DHT_OK: 
+      Serial.print("Teplota IN: "); //temp
+      Serial.print(dht.getTemperatureC()); //prints temp value to serial monitor
+      Serial.println("C \t"); 
+
+      Serial.print("Vlhkost IN: ");  //humi
+      Serial.print(dht.getHumidity()); //prints humi value to serial monitor
+      Serial.println("%");  
+
+      lcd.setCursor(0,0); //set cursor on display
+      lcd.print("Teplota IN: "); //print text 
+      lcd.setCursor(12,0); 
+      lcd.print(dht.getTemperatureC()); //get temp data and print them on display
+      lcd.setCursor(17,0);
+      lcd.print("C");  
+
+      lcd.setCursor(0,1); 
+      lcd.print("Vlhkost IN: ");
+      lcd.setCursor(12,1);      
+      lcd.print(dht.getHumidity()); 
+      lcd.setCursor(17,1);  
+      lcd.print("%");    
+      break; 
+
+      case DHT_ERROR_CHECKSUM: //if error occurs
+        Serial.println("CHYBA"); //prints error to serial monitor
+
+        lcd.clear(); 
+        lcd.setCursor(0,0); 
+        lcd.print("CHYBA");  //prints error on display
+        break; 
+
+      case DHT_ERROR_TIMEOUT: //if timeout error
+        Serial.println("CHYBA SNIMAC NEREAGUJE"); //prints timeout error to serial monitor
+
+        lcd.clear(); 
+        lcd.setCursor(0,0); 
+        lcd.print("CHYBA SNIMAC NEREAGUJE"); //prints timeout error on display
+        break; 
+      
+      case DHT_ERROR_NO_REPLY: //if no-response error,can occur with shitty cables/sensors
+        Serial.println("SNIMAC NEPRIPOJENY"); //prints no-response error to serial monitor
+
+        lcd.clear(); 
+        lcd.setCursor(0,0);
+        lcd.print("SNIMAC NEPRIPOJENY"); //prints no-response error on display
+        break; 
+      }  
+  
+  dht1.read(); //outdoor temp/humi sensor, same stuff as indoor, same errors as indoor
+    switch(dht1.getState()) { 
+      case DHT_OK: 
+        Serial.print("Teplota OUT"); 
+        Serial.print(dht1.getTemperatureC()); 
+        Serial.println(" C \t");  
+
+        Serial.print("Vlhkost OUT: ");  
+        Serial.print(dht1.getHumidity()); 
+        Serial.println("%"); 
+
+        lcd.setCursor(0,2); 
+        lcd.print("Teplota OUT: "); 
+        lcd.setCursor(13,2); 
+        lcd.print(dht1.getTemperatureC()); 
+        lcd.setCursor(18,2);
+        lcd.print("C");   
+
+        lcd.setCursor(0,3); 
+        lcd.print("Vlhkost OUT: ");
+        lcd.setCursor(13,3);      
+        lcd.print(dht1.getHumidity()); 
+        lcd.setCursor(18,3);  
+        lcd.print("%");    
+        break;  
+
+        case DHT_ERROR_CHECKSUM:
+        Serial.println("CHYBA"); 
+
+        lcd.clear(); 
+        lcd.setCursor(0,2); 
+        lcd.print("CHYBA");  
+        break; 
+
+      case DHT_ERROR_TIMEOUT:  
+        Serial.println("CHYBA SNIMAC NEREAGUJE"); 
+
+        lcd.clear(); 
+        lcd.setCursor(0,2);
+        lcd.print("CHYBA SNIMAC NEREAGUJE"); 
+        break; 
+      
+      case DHT_ERROR_NO_REPLY: 
+        Serial.println("SNIMAC NEPRIPOJENY"); 
+
+        lcd.clear(); 
+        lcd.setCursor(0,2);
+        lcd.print("SNIMAC NEPRIPOJENY");
+        break;  
+        }  
+
+  delay(5000);
+  lcd.clear();  
+  
+    //soil moisture sensor
+    Serial.print("Vlhkost zeme:"); //soil moisture
+    Serial.println(analogRead(A0)); //output from sensors is going to Analog pin A0 and then it gets printed in serial monitor
+
+    lcd.setCursor(0,0);
+    lcd.print("Vlhkost zeme:"); 
+    lcd.setCursor(14,0);
+    lcd.print(analogRead(A0));  
+    lcd.setCursor(16,0); 
+    lcd.print("%");   
+
+    delay(5000);     
+
+
+
+
+
+
+
+      
+    
+
+
+              
+      
+
+   
+}  

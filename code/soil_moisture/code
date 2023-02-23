@@ -1,0 +1,17 @@
+void setup() 
+{
+
+} 
+
+void loop() 
+{ 
+
+    Serial.print("Vlhkost zeme:"); //soil moisture
+    Serial.println(analogRead(A0)); //output from sensors is going to Analog pin A0 and then it gets printed in serial monitor
+
+    lcd.setCursor(0,0); //sets cursor on display
+    lcd.print("Vlhkost zeme:"); //prints what r u measuring, in my case, moisture of soil in the garden
+    lcd.setCursor(14,0);
+    lcd.print(analogRead(A0));  //reads data from A0 and prints them on display
+    lcd.setCursor(16,0); 
+    lcd.print("%");      

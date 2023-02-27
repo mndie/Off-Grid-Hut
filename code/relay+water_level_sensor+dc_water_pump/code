@@ -1,0 +1,36 @@
+#define FLOAT_SENSOR  2     //float sensor output pin
+#define LED           3     //water level led indicator
+#define RELAY_PIN     7     //relay pin
+
+void setup() 
+{ 
+  Serial.begin(9600);
+
+  pinMode(LED, OUTPUT);
+  
+  pinMode(FLOAT_SENSOR, INPUT_PULLUP); 
+
+  pinMode(RELAY_PIN, OUTPUT);
+}
+
+void loop()  
+{ 
+  if(digitalRead(FLOAT_SENSOR) == LOW) 
+  {
+    // turn led and switch relay on:
+    digitalWrite(LED, HIGH); 
+    digitalWrite(RELAY_PIN, HIGH);  
+    delay(5000);
+    Serial.print("zapnute cerpadlo aj led"); //ignore this
+    
+  } 
+  else 
+  {
+    //turns led and switches relay off:
+    digitalWrite(LED, LOW); 
+    digitalWrite(RELAY_PIN, LOW); 
+    Serial.print("vypnute"); //ignore this as well 
+  
+  } 
+  
+}

@@ -1,16 +1,29 @@
-//complete code so far, will update everytime i change smthn
 //code for temmp, humidity sensors and 4x20 liquid crystal i2c display 
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h> 
 #include <TroykaDHT.h> 
 
+#define ANALOG_IN_PIN A1 //analog input, pin A1
+
 LiquidCrystal_I2C lcd(0x27,20, 4); //define I2C adress and display size
 
 DHT dht(4, DHT11); //we r defining what sensor r we using and on what pin 
-DHT dht1(5, DHT11); //we r using 2 DHT11 sensors so we r gonna add 1 to the 2nd to separate them 
+DHT dht1(5, DHT11); //we r using 2 DHT11 sensors so we r gonna add 1 to the 2nd to separate them  
+
+float adc_voltage = 0.0; //float for adc voltage 
+float in_voltage = 0.0; //float for input voltage 
+
+float R1 = 30000.0; //float for resistor values in divider [ohms]
+float R2 = 7500.0; //^ 
+
+float ref_voltage = 5.0; //float for reference voltage 
+
+int adc_value = 0; //integer value
 
 void setup() {
-  Serial.begin(9600); //start serial monitor
+  Serial.begin(9600); //start serial monitor 
+
+  Serial.println("Napatie baterie");
 
   lcd.begin(); //start lcd 
   lcd.backlight(); //backlight on
@@ -21,7 +34,8 @@ void setup() {
 
 }
 
-void loop() {
+void loop() 
+{ 
   delay(1000);
   lcd.clear(); 
 
@@ -134,14 +148,28 @@ void loop() {
     Serial.print("Vlhkost zeme:"); //soil moisture
     Serial.println(analogRead(A0)); //output from sensors is going to Analog pin A0 and then it gets printed in serial monitor
 
-    lcd.setCursor(0,0);
-    lcd.print("Vlhkost zeme:"); 
-    lcd.setCursor(14,0);
-    lcd.print(analogRead(A0));  
-    lcd.setCursor(16,0); 
-    lcd.print("%");   
+     lcd.setCursor(0,0);
+     lcd.print("Vlhkost zeme:"); 
+     lcd.setCursor(14,0);
+     lcd.print(analogRead(A0));  
+     lcd.setCursor(16,0); 
+     lcd.print("%");    
 
-    delay(5000);     
+  adc_value = analogRead(ANALOG_IN_PIN); //reads analog input 
+  adc_voltage  = (adc_value * ref_voltage) / 1024.0;  
+  in_voltage = adc_voltage / (R2/(R1+R2)) ;  
+
+   Serial.print("Napatie baterie = ");
+   Serial.println(in_voltage, 2); 
+
+   lcd.setCursor(0,1); 
+   lcd.print("Napatie baterie:"); 
+   lcd.setCursor(17,1); 
+   lcd.print(in_voltage, 2);  
+   lcd.setCursor(20,1);
+   lcd.print("V"); 
+
+  delay(5000);     
 
 
 

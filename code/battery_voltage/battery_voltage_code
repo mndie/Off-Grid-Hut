@@ -1,0 +1,29 @@
+#define ANALOG_IN_PIN A1 //analog input, pin A1  
+
+float adc_voltage = 0.0; //float for adc voltage 
+float in_voltage = 0.0; //float for input voltage
+
+float R1 = 30000.0; //float for resistor values in divider [ohms]
+float R2 = 7500.0; //^
+
+float ref_voltage = 5.0; //float for reference voltage
+
+int adc_value = 0; //integer value
+
+void setup() 
+  {
+    Serial.begin(9600); 
+    Serial.println("Napatie baterie"); 
+  }
+
+void loop() 
+  {
+    adc_value = analogRead(ANALOG_IN_PIN); //reads analog input 
+    adc_voltage  = (adc_value * ref_voltage) / 1024.0;  
+    in_voltage = adc_voltage / (R2/(R1+R2)) ;  
+
+    Serial.print("Napatie baterie = ");
+    Serial.println(in_voltage, 2); 
+
+    delay(500);
+  }

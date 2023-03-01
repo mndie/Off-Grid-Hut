@@ -1,7 +1,15 @@
 //code for temmp, humidity sensors and 4x20 liquid crystal i2c display 
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h> 
-#include <TroykaDHT.h> 
+#include <TroykaDHT.h>  
+#include <math.h>
+
+#define LEDG1 6  //simple control panel leds, we have 3 greens and 3 reds
+#define LEDG2 7
+#define LEDG3 8
+#define LEDR1 9
+#define LEDR2 10
+#define LEDR3 11
 
 #define ANALOG_IN_PIN A1 //analog input, pin A1
 
@@ -18,12 +26,24 @@ float R2 = 7500.0; //^
 
 float ref_voltage = 5.0; //float for reference voltage 
 
-int adc_value = 0; //integer value
+int adc_value = 0; //integer value 
 
-void setup() {
+int sensorPin = A2; //we set analog input for battery temp sensor to A2
+
+double Thermistor(int RawADC) {
+  double Temp;
+  Temp = log(10000.0*((1024.0/RawADC-1))); 
+  Temp = 1 / (0.001129148 + (0.000234125 + (0.0000000876741 * Temp * Temp ))* Temp );
+  Temp = Temp - 294.15;            // Convert Kelvin to Celcius
+   //Temp = (Temp * 9.0)/ 5.0 + 32.0; // Convert Celcius to Fahrenheit
+   return Temp;
+}
+
+void setup()
+ {
   Serial.begin(9600); //start serial monitor 
 
-  Serial.println("Napatie baterie");
+  Serial.println("Napatie bat:");
 
   lcd.begin(); //start lcd 
   lcd.backlight(); //backlight on
@@ -31,6 +51,14 @@ void setup() {
 
   dht.begin(); //start sensors for indoor temp/humi measuring
   dht1.begin(); //start sensors for outdoor temp/humi measuring
+
+  pinMode(LEDG1, OUTPUT); 
+  pinMode(LEDG2, OUTPUT); 
+  pinMode(LEDG3, OUTPUT); 
+
+  pinMode(LEDR1, OUTPUT); 
+  pinMode(LEDR2, OUTPUT); 
+  pinMode(LEDR3, OUTPUT); 
 
 }
 
@@ -62,7 +90,9 @@ void loop()
       lcd.setCursor(12,1);      
       lcd.print(dht.getHumidity()); 
       lcd.setCursor(17,1);  
-      lcd.print("%");    
+      lcd.print("%");  
+
+      digitalWrite(LEDG1, HIGH);   
       break; 
 
       case DHT_ERROR_CHECKSUM: //if error occurs
@@ -70,7 +100,8 @@ void loop()
 
         lcd.clear(); 
         lcd.setCursor(0,0); 
-        lcd.print("CHYBA");  //prints error on display
+        lcd.print("CHYBA");  //prints error on display 
+        digitalWrite(LEDR1, HIGH);
         break; 
 
       case DHT_ERROR_TIMEOUT: //if timeout error
@@ -79,6 +110,7 @@ void loop()
         lcd.clear(); 
         lcd.setCursor(0,0); 
         lcd.print("CHYBA SNIMAC NEREAGUJE"); //prints timeout error on display
+        digitalWrite(LEDR1, HIGH);
         break; 
       
       case DHT_ERROR_NO_REPLY: //if no-response error,can occur with shitty cables/sensors
@@ -87,6 +119,7 @@ void loop()
         lcd.clear(); 
         lcd.setCursor(0,0);
         lcd.print("SNIMAC NEPRIPOJENY"); //prints no-response error on display
+        digitalWrite(LEDR1, HIGH);
         break; 
       }  
   
@@ -113,7 +146,8 @@ void loop()
         lcd.setCursor(13,3);      
         lcd.print(dht1.getHumidity()); 
         lcd.setCursor(18,3);  
-        lcd.print("%");    
+        lcd.print("%");   
+        digitalWrite(LEDG1, HIGH);          
         break;  
 
         case DHT_ERROR_CHECKSUM:
@@ -121,7 +155,8 @@ void loop()
 
         lcd.clear(); 
         lcd.setCursor(0,2); 
-        lcd.print("CHYBA");  
+        lcd.print("CHYBA");   
+        digitalWrite(LEDR1, HIGH);
         break; 
 
       case DHT_ERROR_TIMEOUT:  
@@ -129,7 +164,8 @@ void loop()
 
         lcd.clear(); 
         lcd.setCursor(0,2);
-        lcd.print("CHYBA SNIMAC NEREAGUJE"); 
+        lcd.print("CHYBA SNIMAC NEREAGUJE");
+        digitalWrite(LEDR1, HIGH); 
         break; 
       
       case DHT_ERROR_NO_REPLY: 
@@ -137,7 +173,8 @@ void loop()
 
         lcd.clear(); 
         lcd.setCursor(0,2);
-        lcd.print("SNIMAC NEPRIPOJENY");
+        lcd.print("SNIMAC NEPRIPOJENY"); 
+        digitalWrite(LEDR1, HIGH);
         break;  
         }  
 
@@ -148,26 +185,42 @@ void loop()
     Serial.print("Vlhkost zeme:"); //soil moisture
     Serial.println(analogRead(A0)); //output from sensors is going to Analog pin A0 and then it gets printed in serial monitor
 
-     lcd.setCursor(0,0);
-     lcd.print("Vlhkost zeme:"); 
-     lcd.setCursor(14,0);
-     lcd.print(analogRead(A0));  
-     lcd.setCursor(16,0); 
-     lcd.print("%");    
+    lcd.setCursor(0,0);
+    lcd.print("Vlhkost zeme:"); 
+    lcd.setCursor(14,0);
+    lcd.print(analogRead(A0));  
+    lcd.setCursor(16,0); 
+    lcd.print("%");    
 
   adc_value = analogRead(ANALOG_IN_PIN); //reads analog input 
   adc_voltage  = (adc_value * ref_voltage) / 1024.0;  
   in_voltage = adc_voltage / (R2/(R1+R2)) ;  
 
-   Serial.print("Napatie baterie = ");
-   Serial.println(in_voltage, 2); 
+    Serial.print("Napatie baterie = ");
+    Serial.println(in_voltage, 2); 
+    
+    lcd.setCursor(0,1); 
+    lcd.print("Napatie bat:"); 
+    lcd.setCursor(13,1);
+    lcd.print(in_voltage, 2); 
+    lcd.setCursor(17,1); 
+    lcd.print("V"); 
 
-   lcd.setCursor(0,1); 
-   lcd.print("Napatie baterie:"); 
-   lcd.setCursor(17,1); 
-   lcd.print(in_voltage, 2);  
-   lcd.setCursor(20,1);
-   lcd.print("V"); 
+    digitalWrite(LEDG2, HIGH); 
+  
+  int readVal=analogRead(sensorPin);
+  double temp =  Thermistor(readVal);
+ 
+    Serial.println(temp);  // display tempature
+    //Serial.println(readVal);  // display tempature
+    lcd.setCursor(0,2);
+    lcd.print("Teplota bat:"); 
+    lcd.setCursor(13,2); 
+    lcd.print(temp); 
+    lcd.setCursor(17,2);
+    lcd.print("C");
+    
+    digitalWrite(LEDG3, HIGH);
 
   delay(5000);     
 

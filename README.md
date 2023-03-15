@@ -5,15 +5,21 @@ project to school, theme: Off Grid Electrical Sources.
 stuff used: 
 
 
-arduino mega
+Arduio Mega
 
 
-20x4 I2C liquid crystal display 
+LCD Display 20x4 with I2C module
 
 
-different sensors (temperature, humidity, soil moisture, battery voltage, battery temp, etc) 
+2x DHT11 temperature and humidity sensor 
 
 
-different motors, pumps, shields and drivers 
+1x Battery voltage sensor 
+
+
+1x Step-down voltage convertor 12V -> 5V 
+
+
+Bunch of electrical components like LED diodes, buttons, switches
 
 

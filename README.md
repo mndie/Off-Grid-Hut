@@ -5,7 +5,7 @@ project to school, theme: Off Grid Electrical Sources.
 stuff used: 
 
 
-Arduio Mega
+Arduino Mega
 
 LCD Display 20x4 with I2C module
 

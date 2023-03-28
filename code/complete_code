@@ -2,7 +2,10 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h> 
 #include <TroykaDHT.h>  
-#include <math.h>
+#include <math.h> 
+
+int LEDB = 3; 
+float volt,voltage; 
 
 #define LEDG1 6  //simple control panel leds, we have 3 greens and 3 reds
 #define LEDG2 7
@@ -45,7 +48,7 @@ void setup()
 
   Serial.println("Napatie bat:");
 
-  lcd.begin(); //start lcd 
+  
   lcd.backlight(); //backlight on
   lcd.clear(); //clear display
 
@@ -60,10 +63,27 @@ void setup()
   pinMode(LEDR2, OUTPUT); 
   pinMode(LEDR3, OUTPUT); 
 
+  pinMode(LEDB, OUTPUT); 
+  digitalWrite(LEDB, LOW); 
 }
 
 void loop() 
-{ 
+{  
+  volt= analogRead(A4); //reads value on analog pin 4 
+  voltage = volt* (5.0 / 10223.0); //converts analog value to volts
+
+  if (voltage < 1) // if voltage from solar panel is less than 1V led is off,
+  { 
+    digitalWrite(LEDB, LOW);    
+  }     
+  else  //if voltage from solar panel is more than 1V led is on
+  {
+    digitalWrite(LEDB, HIGH);
+  } 
+
+  Serial.print("Napatie solar = "); 
+  Serial.print (voltage); 
+  Serial.println("V");
   delay(1000);
   lcd.clear(); 
 
@@ -223,19 +243,4 @@ void loop()
     digitalWrite(LEDG3, HIGH);
 
   delay(5000);     
-
-
-
-
-
-
-
-      
-    
-
-
-              
-      
-
-   
-}  
+}   
